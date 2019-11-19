@@ -51,18 +51,19 @@ function wiz_checksys(\
 
 function wiz_installreq(\
 	h, failed, status) {
-	h = zenity_progress("Installing required packages...", 0, gzenity " --ok-label 'Next' --cancel-label 'Back'")
+	h = zenity_progress("Installing required packages (this may take a long time)...", 0, gzenity " --ok-label 'Next' --cancel-label 'Back'")
 	# TODO: support other distros?
 	for (i = 0; i < length(REQPKGS); i++) {
 		print "# Installing " REQPKGS[i] "..." | h
 		if (system("apt install -y " REQPKGS[i]) > 0) {
 			failed = 1
+			print "# Error: failed to install " REQPKGS[i] | h
 			break
 		}
 		print sprintf("%d", 100/length(REQPKGS)*(i+1)) | h
 	}
-	status = close(h)
 	if (!failed) print "# Successfully installed packages" | h
+	status = close(h)
 	if (status == 0 && !failed){
 		wizard_next()
 	} else {
@@ -74,10 +75,11 @@ function wiz_installreq(\
 
 function wiz_osxkvm_git(\
 	h,status,failed) {
-	h = zenity_progress("Downloading OSX-KVM (this will take a long time)...", 0, gzenity " --ok-label 'Next' --cancel-label 'Back'")
+	h = zenity_progress("Downloading OSX-KVM (this may take a long time)...", 0, gzenity " --ok-label 'Next' --cancel-label 'Back'")
 	print "20" | h
 	if (system("test -d /opt/ra1nstorm") == 0) {
 	} else if (system("mkdir -p /opt/ra1nstorm && cd /opt/ra1nstorm && git clone https://github.com/kholia/OSX-KVM --depth 1") != 0) {
+		print "# Error: failed to download OSX-KVM" | h
 		failed = 1
 	}
 	if (!failed) print "# Downloaded OSX-KVM" | h
@@ -91,6 +93,36 @@ function wiz_osxkvm_git(\
 	}
 }
 
+function wiz_osxkvm_getdmg(\
+	h,status,failed,NUM) {
+	NUM = 4 # this is awful
+	h = zenity_progress("Downloading components... (this may take a long time)...", 0, gzenity " --ok-label 'Next' --cancel-label 'Back'")
+	print "20" | h
+	print "# Downloading macOS installation image (this WILL take a long time)..." | h
+	if (system("test -f /opt/ra1nstorm/OSX-KVM/BaseSystem.img") == 0) {
+	} else if (system("echo " NUM " | (cd /opt/ra1nstorm/OSX-KVM && ./fetch-macOS.py && dmg2img BaseSystem.dmg BaseSystem.img)")) {
+		print "# Failed to download macOS installation image" | h
+		failed = 1
+	}
+	if (!failed) print "# Downloaded macOS installer" | h
+	status = close(h)
+	if (status == 0 && !failed) {
+		wizard_next()
+	} else {
+		if (failed)
+			zenity_alert("error", "ra1nstorm failed to download the macOS installer")
+		exit(1)
+	}
+}
+
+function wiz_bootinst(\
+	h,status,failed) {
+	h = zenity_progress("Booting macOS Setup...", 0, gzenity " --ok-label 'Next' --cancel-label 'Back'")
+	close(h)
+	zenity_error("error", "Error")
+	exit(0)
+}
+
 function wizard_next() { wizard_page = wizard_page + 1 }
 function wizard_back() { wizard_page = wizard_page - 1 }
 
@@ -102,6 +134,8 @@ BEGIN {
 	wizard[1] = "wiz_checksys"
 	wizard[2] = "wiz_installreq"
 	wizard[3] = "wiz_osxkvm_git"
+	wizard[4] = "wiz_osxkvm_getdmg"
+	wizard[5] = "wiz_bootinst"
 	while (wizard_page < length(wizard)) {
 		wiz_fn_name = wizard[wizard_page]
 		wiz_res = @wiz_fn_name()
