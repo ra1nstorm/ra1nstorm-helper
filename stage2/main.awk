@@ -1,4 +1,5 @@
 @include "libzenity.awk"
+@include "usbutil.awk"
 function execforline(n,\
 	ret) {
 	n | getline ret
@@ -100,7 +101,7 @@ function wiz_osxkvm_getdmg(\
 	print "20" | h
 	print "# Downloading macOS installation image (this WILL take a long time)..." | h
 	if (system("test -f /opt/ra1nstorm/OSX-KVM/BaseSystem.img") == 0) {
-	} else if (system("echo " NUM " | (cd /opt/ra1nstorm/OSX-KVM && ./fetch-macOS.py && dmg2img BaseSystem.dmg BaseSystem.img)")) {
+	} else if (system("echo " NUM " | (cd /opt/ra1nstorm/OSX-KVM && ./fetch-macOS.py && dmg2img BaseSystem.dmg BaseSystem.img && qemu-img create -f qcow2 mac_hdd_ng.img 32G)")) {
 		print "# Failed to download macOS installation image" | h
 		failed = 1
 	}
@@ -117,10 +118,71 @@ function wiz_osxkvm_getdmg(\
 
 function wiz_bootinst(\
 	h,status,failed) {
-	h = zenity_progress("Booting macOS Setup...", 0, gzenity " --ok-label 'Next' --cancel-label 'Back'")
+	h = zenity_progress("Booting macOS Setup...", 0, gzenity " --ok-label 'See Instructions' --cancel-label 'Back'")
+	print "40" | h
+	failed = system("(cp vmprepare.txt /opt/ra1nstorm/vmprepare.sh && sh /opt/ra1nstorm/vmprepare.sh && cd /opt/ra1nstorm/OSX-KVM && ./boot-macOS-Catalina.sh &)")
+	if (!failed) print "# Please click \"See Instructions\" to see the steps you need to take." | h
+	status = close(h)
+	if (status == 0 && !failed) {
+		wizard_next()
+	} else {
+		if (failed)
+			zenity_alert("error", "ra1nstorm failed to initialize the macOS installer")
+		exit(1)
+	}
 	close(h)
-	zenity_error("error", "Error")
-	exit(0)
+}
+
+function wiz_bootinstructions() {
+	if (zenity_html("./installerhelp.html", 0, gzenity " --ok-label 'I Have Finished Setup' --cancel-label 'Exit'") == 0) {
+		wizard_next()
+	} else {
+		exit(0)
+	}
+}
+
+function wiz_configiommu(\
+	h,status,failed,pciid) {
+	zenity_alert("info", "ra1nstorm will now attempt to detect which USB controller to forward.\n" \
+				"Please disconnect all other USB devices and connect ONLY your iPhone directly to your computer.\n" \
+				"Do NOT use a USB hub or any similar gadgets.")
+	h = zenity_progress("Autodetecting USB configuration...", 0, gzenity " --ok-label 'Reboot' --cancel-label 'Back'")
+	print "20" | h
+	print "# Locating USB controller... " pciid | h
+	pciid = find_usb_controller("ipheth")
+	print "45" | h
+	print "# Patching GRUB..." | h
+	ok = system("echo vfio >> /etc/modules && echo vfio_iommu_type1 >> /etc/modules && echo vfio_pci >> /etc/modules && echo vfio_virqfd >> /etc/modules &&" \
+		"sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=\"/GRUB_CMDLINE_LINUX_DEFAULT=\"iommu=pt intel_iommu=on video=efifb:off/' /etc/default/grub &&" \
+		"echo 'options vfio-pci ids=" pciid "' > /etc/modprobe.d/vfio.conf &&" \
+		"update-grub2 && update-initramfs -k all -u")
+	if (ok != 0)
+		failed = 1
+	print "70" | h
+	print "# Patching boot scripts..." | h
+	ok = system("sed -i 's/-vga vmware/-vga vmware -device vfio-pci,host=" pciid ",bus=pcie.0/g' /opt/ra1nstorm/OSX-KVM/boot-macOS-Catalina.sh")
+	if (ok != 0)
+		failed = 1
+	print "90" | h
+	print "PCI=" pciid > "/opt/ra1nstorm/vmconfig.sh"
+	print "Creating shortcuts..." | h
+	system("cp 'BootVM.sh' $HOME && cp 'BootVM.sh' $HOME/Desktop")
+	status = close(h)
+	if (status == 0 && !failed) {
+		wizard_next()
+	} else {
+		if (failed)
+			zenity_alert("error", "ra1nstorm was unable to configure PCI passthrough for your USB controller")
+		exit(1)
+	}
+	close(h)
+}
+
+function wiz_reboot() {
+	if (dryrun)
+		print "REBOOT NOW!"
+	else
+		system("reboot")
 }
 
 function wizard_next() { wizard_page = wizard_page + 1 }
@@ -136,6 +198,10 @@ BEGIN {
 	wizard[3] = "wiz_osxkvm_git"
 	wizard[4] = "wiz_osxkvm_getdmg"
 	wizard[5] = "wiz_bootinst"
+	wizard[6] = "wiz_bootinstructions"
+	wizard[7] = "wiz_configiommu"
+	wizard[8] = "wiz_reboot"
+	if (!wizard_page) wizard_page = 0
 	while (wizard_page < length(wizard)) {
 		wiz_fn_name = wizard[wizard_page]
 		wiz_res = @wiz_fn_name()

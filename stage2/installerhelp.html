@@ -1,0 +1,32 @@
+<h3>Note</h3>
+<p><b style="color:red">Installing macOS will probably take 1-2 hours. Please be patient during this process and follow the steps below.</b></p>
+<h4 id="installer-steps">Installer Steps</h4>
+<ul>
+<li><p>After booting, the initial language selection should show up.
+<img src="https://cloud.githubusercontent.com/assets/731252/17645877/5136b1ac-61b2-11e6-8d90-29f5cc11ae01.png" alt="screenshot_01"></p>
+</li>
+<li><p>After selecting the language, fire-up the Disk Utility ...
+<img src="https://cloud.githubusercontent.com/assets/731252/17645881/513b6918-61b2-11e6-91f2-026d953cbe0b.png" alt="screenshot_02"></p>
+</li>
+<li><p>... and initialize the new harddisk. If this step fails and the menu bar
+shows &quot;Language Chooser&quot; then see the Debugging section below.</p>
+</li>
+</ul>
+<p><img src="https://cloud.githubusercontent.com/assets/731252/17645878/51373d48-61b2-11e6-8740-69c86bf92d31.png" alt="screenshot_03">
+<img src="https://cloud.githubusercontent.com/assets/731252/17645879/513ae704-61b2-11e6-9a54-109c37132783.png" alt="screenshot_04"></p>
+<ul>
+<li>After disk initialization, open a terminal window (in the Utilities menu) and recursively copy the /Extra folder
+to the newly initialized target volume using<pre class="brush: bash;"> cp -av /Extra &quot;/Volumes/NewVolumeName&quot;
+</pre>
+</li>
+<li><p>When done, quit Terminal.
+<img src="https://cloud.githubusercontent.com/assets/731252/17645876/5136ad6a-61b2-11e6-84cd-cb7851119292.png" alt="screenshot_05"></p>
+</li>
+<li><p>Now, you can continue with the installation as usual
+<img src="https://cloud.githubusercontent.com/assets/731252/17645880/513b2c3c-61b2-11e6-889c-3e4f5a0612ca.png" alt="screenshot_06"></p>
+</li>
+<li><p>When finished, the VM will reboot automatically and the first time setup continues as usual.
+<img src="https://cloud.githubusercontent.com/assets/731252/17645882/51517a50-61b2-11e6-8bb5-70c810d80b2b.png" alt="screenshot_07"></p>
+</li>
+</ul>
+
