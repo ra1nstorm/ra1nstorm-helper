@@ -49,6 +49,14 @@ following:
 4. Enable it
 5. Reboot
 
+#### 6. Can't I just use Ubuntu from a USB flash drive?
+
+No you cannot. When ra1nstorm forwards the USB controller, your system will crash.
+
+#### 7. Can I use other Linux distros that aren't Ubuntu?
+
+No, they are currently not supported, but probably will be in the future.
+
 ## Important Notice
 
 This software is provided WITHOUT WARRANTY in the hopes that it will be useful.
