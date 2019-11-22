@@ -3,12 +3,12 @@
 ; http://mitrichsoftware.wordpress.com/
 ; https://code.google.com/p/inno-download-plugin/
 
-#define IDPROOT ExtractFilePath(__PATHFILENAME__)
+#define IDPROOT "idp\"
 
 #ifdef UNICODE
-    #pragma include __INCLUDE__ + ";" + IDPROOT + "\unicode"
+    #pragma include __INCLUDE__ + ";" + IDPROOT + "unicode"
 #else
-    #pragma include __INCLUDE__ + ";" + IDPROOT + "\ansi"
+    #pragma include __INCLUDE__ + ";" + IDPROOT + "ansi"
 #endif
 
 ; If IDP_DEBUG is defined before including idp.iss, script will use debug version of idp.dll (not included, you need to build it yourself).
@@ -20,9 +20,9 @@
 #endif
 
 #ifdef UNICODE
-    #define IDPDLLDIR IDPROOT + "\unicode" + DBGSUFFIX
+    #define IDPDLLDIR IDPROOT + "unicode" + DBGSUFFIX
 #else
-    #define IDPDLLDIR IDPROOT + "\ansi" + DBGSUFFIX
+    #define IDPDLLDIR IDPROOT + "ansi" + DBGSUFFIX
 #endif
 
 #define IDP_VER_MAJOR         
@@ -31,7 +31,7 @@
 #define IDP_VER_BUILD
 
 #expr ParseVersion(IDPDLLDIR + "\idp.dll", IDP_VER_MAJOR, IDP_VER_MINOR, IDP_VER_REV, IDP_VER_BUILD)
-#define IDP_VER EncodeVer(IDP_VER_MAJOR, IDP_VER_MINOR, IDP_VER_REV, IDP_VER_BUILD)
+;#define IDP_VER EncodeVer(IDP_VER_MAJOR, IDP_VER_MINOR, IDP_VER_REV, IDP_VER_BUILD)
 
 #define IDP_VER_STR GetFileVersion(IDPDLLDIR + "\idp.dll")
 
@@ -659,4 +659,4 @@ begin
     idpInitMessages;
 end;
 
-#include <idplang\default.iss>
+#include "ansi\idplang\default.iss"

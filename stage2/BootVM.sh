@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "$(id -u)" != 0 ]; then
+	echo "Run as root."
+	exec sudo $0
+fi
+
 cd /opt/ra1nstorm
 . vmprepare.sh
 . vmconfig.sh

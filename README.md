@@ -2,6 +2,9 @@
 
 The ra1nstorm helper prepares an environment adequate for running checkra1n.
 
+* **[Join us on Discord](https://discord.gg/e9W8cv8)**
+* **[Twitter](https://twitter.com/realra1nstorm)**
+
 ## Stage1
 
 Stage1 (`stage1/`) contains the Windows-part of the setup and is responsible
