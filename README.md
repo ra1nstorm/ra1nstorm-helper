@@ -36,7 +36,8 @@ and follow the instructions.
 
 #### 4. Does this work with AMD CPUs?
 
-ra1nstorm does not currently support AMD CPUs.
+ra1nstorm does not currently support AMD CPUs. This is because macOS does not
+work properly with them. Please complain to Apple, not us.
 
 #### 5. BootVM tells me that I need to enable "VT-d" or something. How?
 
