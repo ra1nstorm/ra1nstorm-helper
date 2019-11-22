@@ -145,11 +145,18 @@ function wiz_configiommu(\
 	h,status,failed,pciid) {
 	zenity_alert("info", "ra1nstorm will now attempt to detect which USB controller to forward.\n" \
 				"Please disconnect all other USB devices and connect ONLY your iPhone directly to your computer.\n" \
-				"Do NOT use a USB hub or any similar gadgets.")
+				"Do NOT use a USB hub or any similar gadgets.\n\nPress OK to continue.")
 	h = zenity_progress("Autodetecting USB configuration...", 0, gzenity " --ok-label 'Reboot' --cancel-label 'Back'")
 	print "20" | h
-	print "# Locating USB controller... " pciid | h
-	pciid = find_usb_controller("ipheth")
+	pciid = ""
+	while (pciid == "") {
+		print "# Locating USB controller..." | h
+		pciid = find_usb_controller("ipheth")
+		if (pciid == "") {
+			system("sleep 1")
+			print "# Still locating USB controller... (plug in your iPhone)" | h
+		}
+	}
 	print "45" | h
 	print "# Patching GRUB..." | h
 	ok = system("echo vfio >> /etc/modules && echo vfio_iommu_type1 >> /etc/modules && echo vfio_pci >> /etc/modules && echo vfio_virqfd >> /etc/modules &&" \

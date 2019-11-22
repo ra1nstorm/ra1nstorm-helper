@@ -12,6 +12,40 @@ for preparing the Linux environment.
 Stage2 (`stage2/`) contains the Linux part of the setup and prepares the macOS
 VM and automatically configures IOMMU/vfio.
 
+## FAQ
+
+#### 1. Is it legal?
+
+ra1nstorm downloads freely available components like the macOS installer from
+official servers. We do not host any components ourselves.
+
+ra1nstorm is 100% legal
+
+#### 2. Does it work on iPads or iPods?
+
+ra1nstorm setup does not currently work with iPads or iPods, but after initial
+setup, they should work fine.
+
+#### 3. How do I run checkra1n?
+
+Simply visit the [checkra1n website](https://checkra.in) from within the VM
+and follow the instructions.
+
+#### 4. Does this work with AMD CPUs?
+
+ra1nstorm does not currently support AMD CPUs.
+
+#### 5. BootVM tells me that I need to enable "VT-d" or something. How?
+
+Steps for enabling Intel VT-d (IOMMU) vary by motherboard, but are usually like the
+following:
+
+1. Enter the computer BIOS (probably F12 on boot)
+2. Navigate to an "Advanced" tab
+3. Select the "VT-d" or similar option
+4. Enable it
+5. Reboot
+
 ## Important Notice
 
 This software is provided WITHOUT WARRANTY in the hopes that it will be useful.
