@@ -26,8 +26,8 @@ ra1nstorm is 100% legal
 
 #### 2. Does it work on iPads or iPods?
 
-ra1nstorm setup does not currently work with iPads or iPods, but after initial
-setup, they should work fine.
+ra1nstorm setup ~~does not~~ *should* currently work with iPads or iPods, but after initial
+setup, they will definitely work fine.
 
 #### 3. How do I run checkra1n?
 
@@ -36,8 +36,10 @@ and follow the instructions.
 
 #### 4. Does this work with AMD CPUs?
 
-ra1nstorm does not currently support AMD CPUs. This is because macOS does not
-work properly with them. Please complain to Apple, not us.
+Yes it does.
+
+~~ra1nstorm does not currently support AMD CPUs. This is because macOS does not
+work properly with them. Please complain to Apple, not us.~~
 
 #### 5. BootVM tells me that I need to enable "VT-d" or something. How?
 
@@ -72,4 +74,9 @@ This software is *beta quality*. Be careful.
 
 ra1nstorm (C) 2019 Ronsor Labs. This software is licensed under the terms of the
 MIT/X11 license.
+
 checkra1n (C) 2019 Kim Jong Cracks. Development by qwertyoruiop, axi0mx, et al.
+
+Thanks to the creator of OSX-KVM and all contributors.
+
+

@@ -7,6 +7,10 @@ function execforline(n,\
 	return ret
 }
 
+function cpu_is_intel() {
+	return system("lscpu | grep 'Model name' | grep -q Intel") == 0
+}
+
 function wiz_intro() {
 	if (zenity_html("./intro.html", 0, gzenity " --ok-label 'Get Started' --cancel-label 'Exit'") == 0) {
 		wizard_next()
@@ -24,14 +28,14 @@ function wiz_checksys(\
 	if (!match(execforline("id -u"), /^0/)) {
 		print "# Error: you need to run ra1nstorm as root" | h
 		failed = 1
-	} else if (!match(execforline("lscpu | grep Vendor && sleep 1"), /.*GenuineIntel.*/)) {
-		print "# Error: this computer does not have an Intel CPU" | h
-		failed = 1
+	#} else if (!match(execforline("lscpu | grep Vendor && sleep 1"), /.*GenuineIntel.*/)) {
+	#	print "# Error: this computer does not have an Intel CPU" | h
+	#	failed = 1
 	} else if (execforline("df --output=avail $HOME | tail -n1") < (40 * 1024 * 1024)) { # 40GiB
 		print "# Error: at least 40G of disk space is required" | h
 		failed = 1
-	} else if (execforline("cat /proc/meminfo | grep MemTotal | tr -d '[A-Za-z: ]'") < (4.5 * 1024 * 1024)) { # 8GiB
-		print "# Error: at least 6G of RAM is required" | h
+	} else if (execforline("cat /proc/meminfo | grep MemTotal | tr -d '[A-Za-z: ]'") < (4 * 1000 *  1000)) { # 4GiB
+		print "# Error: at least 4G of RAM is required" | h
 		failed = 1
 	} else if (!match(execforline("lscpu | grep Flags"), /.*vmx.*/)) {
 		print "# Error: your CPU does not support hardware virtualization (or it is not enabled in the BIOS)" | h
@@ -54,6 +58,7 @@ function wiz_installreq(\
 	h, failed, status) {
 	h = zenity_progress("Installing required packages (this may take a long time)...", 0, gzenity " --ok-label 'Next' --cancel-label 'Back'")
 	# TODO: support other distros?
+	system("apt update")
 	for (i = 0; i < length(REQPKGS); i++) {
 		print "# Installing " REQPKGS[i] "..." | h
 		if (system("apt install -y " REQPKGS[i]) > 0) {
@@ -142,9 +147,11 @@ function wiz_bootinstructions() {
 }
 
 function wiz_configiommu(\
-	h,status,failed,pciid) {
+	h,status,failed,pciid,cpumanf) {
+	cpumanf = "intel"
+	if (!cpu_is_intel()) cpumanf = "amd"
 	zenity_alert("info", "ra1nstorm will now attempt to detect which USB controller to forward.\n" \
-				"Please disconnect all other USB devices and connect ONLY your iPhone directly to your computer.\n" \
+				"Please disconnect all other USB devices (except your keyboard and/or mouse) and connect ONLY your iPhone directly to your computer.\n" \
 				"Do NOT use a USB hub or any similar gadgets.\n\nPress OK to continue.")
 	h = zenity_progress("Autodetecting USB configuration...", 0, gzenity " --ok-label 'Reboot' --cancel-label 'Back'")
 	print "20" | h
@@ -160,7 +167,7 @@ function wiz_configiommu(\
 	print "45" | h
 	print "# Patching GRUB..." | h
 	ok = system("echo vfio >> /etc/modules && echo vfio_iommu_type1 >> /etc/modules && echo vfio_pci >> /etc/modules && echo vfio_virqfd >> /etc/modules &&" \
-		"sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=\"/GRUB_CMDLINE_LINUX_DEFAULT=\"iommu=pt intel_iommu=on video=efifb:off/' /etc/default/grub &&" \
+		"sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=\"/GRUB_CMDLINE_LINUX_DEFAULT=\"iommu=pt amd_iommu=on intel_iommu=on video=efifb:off/' /etc/default/grub &&" \
 		"echo 'options vfio-pci ids=" pciid "' > /etc/modprobe.d/vfio.conf &&" \
 		"update-grub2 && update-initramfs -k all -u")
 	if (ok != 0)
