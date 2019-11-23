@@ -29,7 +29,7 @@ end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
-    if CurStep = ssPostInstall then
+    if CurStep = ssInstall then
     begin
         // Copy downloaded files to application directory
         FileCopy(ExpandConstant('{tmp}\ra1nlinux\wubi.exe'), ExpandConstant('{app}\wubi.exe'), false);
