@@ -37,7 +37,7 @@ function wiz_checksys(\
 	} else if (execforline("cat /proc/meminfo | grep MemTotal | tr -d '[A-Za-z: ]'") < (4 * 1000 *  1000)) { # 4GiB
 		print "# Error: at least 4G of RAM is required" | h
 		failed = 1
-	} else if (!match(execforline("lscpu | grep Flags"), /.*vmx.*/)) {
+	} else if (system("test -e /dev/kvm") != 0) {
 		print "# Error: your CPU does not support hardware virtualization (or it is not enabled in the BIOS)" | h
 		failed = 1
 	}
