@@ -34,7 +34,7 @@ function wiz_checksys(\
 	} else if (execforline("df --output=avail $HOME | tail -n1") < (40 * 1024 * 1024)) { # 40GiB
 		print "# Error: at least 40G of disk space is required" | h
 		failed = 1
-	} else if (execforline("cat /proc/meminfo | grep MemTotal | tr -d '[A-Za-z: ]'") < (4 * 1000 *  1000)) { # 4GiB
+	} else if (execforline("cat /proc/meminfo | grep MemTotal | tr -d '[A-Za-z: ]'") < (3 * 1000 *  1000)) { # 4GiB. This is probably a bad idea.
 		print "# Error: at least 4G of RAM is required" | h
 		failed = 1
 	} else if (system("test -e /dev/kvm") != 0) {
