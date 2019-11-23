@@ -15,7 +15,7 @@ OutputDir              = ..\
 Source: "..\ra1nstorm.run"; DestDir: "{app}"
 
 [Run]
-Filename: "{app}\wubi.exe"; Parameters: "--size=64000"
+Filename: "{tmp}\ra1nlinux\wubi.exe"; Parameters: "--size=64000"
 
 [Code]
 procedure InitializeWizard();
@@ -25,15 +25,5 @@ begin
     idpAddFile('http://mirror.us.leaseweb.net/ubuntu-cdimage/xubuntu/releases/18.04/release/xubuntu-18.04.2-desktop-amd64.iso', ExpandConstant('{tmp}\ra1nlinux\xubuntu-18.04.2-desktop-amd64.iso'));
 
     idpDownloadAfter(wpReady);
-end;
-
-procedure CurStepChanged(CurStep: TSetupStep);
-begin
-    if CurStep = ssInstall then
-    begin
-        // Copy downloaded files to application directory
-        FileCopy(ExpandConstant('{tmp}\ra1nlinux\wubi.exe'), ExpandConstant('{app}\wubi.exe'), false);
-        FileCopy(ExpandConstant('{tmp}\ra1nlinux\xubuntu-18.04.2-desktop-amd64.iso'), ExpandConstant('{app}\xubuntu-18.04.2-desktop-amd64.iso'), false);
-    end;
 end;
 
