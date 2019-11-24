@@ -172,6 +172,7 @@ function wiz_configiommu(\
 	ok = system("cp /etc/modules /etc/modules.bak && cp /etc/default/grub /etc/default/grub.bak && echo vfio >> /etc/modules && echo vfio_iommu_type1 >> /etc/modules && echo vfio_pci >> /etc/modules && echo vfio_virqfd >> /etc/modules &&" \
 		"sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=\"/GRUB_CMDLINE_LINUX_DEFAULT=\"iommu=pt amd_iommu=on intel_iommu=on /' /etc/default/grub &&" \
 		"echo 'options vfio-pci ids=" pciid "' > /etc/modprobe.d/vfio.conf &&" \
+		"echo 'options vfio_iommu_type1 allow_unsafe_interrupts=1' >> /etc/modprobe.d/vfio.conf &&" \
 		"update-grub2 && update-initramfs -k all -u")
 	if (ok != 0)
 		failed = 1
