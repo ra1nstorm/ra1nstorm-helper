@@ -239,7 +239,7 @@ function main_menu(\
 	if (opt == 1) {
 		init_wizard(0)
 	} else if (opt == 2) {
-		system("(uname -a; uptime; df -h; ls -lR /opt/ra1nstorm; dmesg; lscpu; lspci -nn; lsusb; lsusb -t; lspci -v; lsusb -v) 2>&1 > $HOME/Desktop/SystemLog.txt")
+		system("(uname -a; uptime; df -h; ls -lR /opt/ra1nstorm; dmesg; lscpu; lspci -nn; lsusb; lsusb -t; lspci -v; lsusb -v) 2>&1 > $HOME/Desktop/SystemLog.txt && chmod 666 $HOME/Desktop/SystemLog.txt")
 		zenity_alert("info", "A log file has been saved on your desktop. Please send it to a ra1n genius for help.")
 	} else if (opt == 3) {
 		init_wizard(7)
