@@ -31,7 +31,8 @@ function wiz_checksys(\
 	#} else if (!match(execforline("lscpu | grep Vendor && sleep 1"), /.*GenuineIntel.*/)) {
 	#	print "# Error: this computer does not have an Intel CPU" | h
 	#	failed = 1
-	} else if (execforline("df --output=avail $HOME | tail -n1") < (40 * 1024 * 1024)) { # 40GiB
+	} else if (execforline("df --output=avail $HOME | tail -n1") < (40 * 1024 * 1024) &&
+		system("test -d /opt/ra1nstorm/OSX-KVM") != 0) { # 40GiB
 		print "# Error: at least 40G of disk space is required" | h
 		failed = 1
 	} else if (execforline("cat /proc/meminfo | grep MemTotal | tr -d '[A-Za-z: ]'") < (3 * 1000 *  1000)) { # 4GiB. This is probably a bad idea.
@@ -83,7 +84,7 @@ function wiz_osxkvm_git(\
 	h,status,failed) {
 	h = zenity_progress("Downloading OSX-KVM (this may take a long time)...", 0, gzenity " --ok-label 'Next' --cancel-label 'Back'")
 	print "20" | h
-	if (system("test -d /opt/ra1nstorm") == 0) {
+	if (system("test -x /opt/ra1nstorm/OSX-KVM/fetch-macOS.py") == 0) {
 	} else if (system("mkdir -p /opt/ra1nstorm && cd /opt/ra1nstorm && git clone https://github.com/kholia/OSX-KVM --depth 1") != 0) {
 		print "# Error: failed to download OSX-KVM" | h
 		failed = 1
@@ -159,14 +160,16 @@ function wiz_configiommu(\
 	while (pciid == "") {
 		print "# Locating USB controller..." | h
 		pciid = find_usb_controller("ipheth")
-		if (pciid == "") {
+		print "debug! pciid="pciid
+		if (!pciid) {
 			system("sleep 1")
+			print "20" | h
 			print "# Still locating USB controller... (plug in your iPhone)" | h
 		}
 	}
 	print "45" | h
 	print "# Patching GRUB..." | h
-	ok = system("echo vfio >> /etc/modules && echo vfio_iommu_type1 >> /etc/modules && echo vfio_pci >> /etc/modules && echo vfio_virqfd >> /etc/modules &&" \
+	ok = system("cp /etc/modules /etc/modules.bak && cp /etc/default/grub /etc/default/grub.bak && echo vfio >> /etc/modules && echo vfio_iommu_type1 >> /etc/modules && echo vfio_pci >> /etc/modules && echo vfio_virqfd >> /etc/modules &&" \
 		"sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=\"/GRUB_CMDLINE_LINUX_DEFAULT=\"iommu=pt amd_iommu=on intel_iommu=on /' /etc/default/grub &&" \
 		"echo 'options vfio-pci ids=" pciid "' > /etc/modprobe.d/vfio.conf &&" \
 		"update-grub2 && update-initramfs -k all -u")
@@ -174,13 +177,13 @@ function wiz_configiommu(\
 		failed = 1
 	print "70" | h
 	print "# Patching boot scripts..." | h
-	ok = system("sed -i 's/-vga vmware/-vga vmware -device vfio-pci,host=" pciid ",bus=pcie.0/g' /opt/ra1nstorm/OSX-KVM/boot-macOS-Catalina.sh")
+	ok = system("sed -i 's/-vga vmware.*/-vga vmware -device vfio-pci,host=" pciid ",bus=pcie.0/g' /opt/ra1nstorm/OSX-KVM/boot-macOS-Catalina.sh")
 	if (ok != 0)
 		failed = 1
 	print "90" | h
 	print "PCI=" pciid > "/opt/ra1nstorm/vmconfig.sh"
 	print "Creating shortcuts..." | h
-	system("cp 'BootVM.sh' $HOME && cp 'BootVM.sh' $HOME/Desktop")
+	system("cp 'BootVM.sh' $HOME && cp 'BootVM.sh' $HOME/Desktop && chmod +x $HOME/BootVM.sh && chmod +x $HOME/Desktop/BootVM.sh")
 	status = close(h)
 	if (status == 0 && !failed) {
 		wizard_next()
@@ -199,8 +202,52 @@ function wiz_reboot() {
 		system("reboot")
 }
 
+function init_wizard(pg) {
+	wizard_page = pg
+	if (!wizard_page) wizard_page = 0
+	while (wizard_page < length(wizard)) {
+		wiz_fn_name = wizard[wizard_page]
+		wiz_res = @wiz_fn_name()
+	}
+}
+
 function wizard_next() { wizard_page = wizard_page + 1 }
 function wizard_back() { wizard_page = wizard_page - 1 }
+
+function uninstall(\
+	h) {
+	if (zenity_alert("question", "Are you sure you want to remove ra1nstorm?") != 0)
+		return
+	h = zenity_progress("Uninstalling...", 0, gzenity " --ok-label 'Finish' --cancel-label 'Cancel'")
+	print "50" | h
+	system("rm -rf /opt/ra1nstorm")
+	print "90" | h
+	system("cp /etc/default/grub.bak /etc/default/grub; cp /etc/modules.bak /etc/modules")
+	print "# ra1nstorm has been successfully removed." | h
+	close(h)
+	if (zenity_alert("question", "ra1nstorm has been removed. You will need to reboot for the changes to take effect.\nReboot now?") == 0) {
+		system("reboot")
+	}
+}
+
+function main_menu(\
+	opt,optlist) {
+	optlist = "Install"
+	if (system("test -d /opt/ra1nstorm") == 0)
+		optlist = optlist ";Repair USB/VFIO Config;Boot VM;Uninstall"
+	opt = zenity_radiolist(optlist, "Please choose an action")
+	if (opt == 1) {
+		init_wizard(0)
+	} else if (opt == 2) {
+		init_wizard(7)
+	} else if (opt == 3) {
+		system("bash $HOME/BootVM.sh")
+	} else if (opt == 4) {
+		uninstall()
+	} else {
+		exit(0)
+	}
+}
 
 BEGIN {
 	gtitle = "ra1nstorm"
@@ -215,9 +262,5 @@ BEGIN {
 	wizard[6] = "wiz_bootinstructions"
 	wizard[7] = "wiz_configiommu"
 	wizard[8] = "wiz_reboot"
-	if (!wizard_page) wizard_page = 0
-	while (wizard_page < length(wizard)) {
-		wiz_fn_name = wizard[wizard_page]
-		wiz_res = @wiz_fn_name()
-	}
+	while (1) main_menu()
 }
