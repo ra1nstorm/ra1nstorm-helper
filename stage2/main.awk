@@ -102,7 +102,7 @@ function wiz_osxkvm_git(\
 
 function wiz_osxkvm_getdmg(\
 	h,status,failed,NUM) {
-	NUM = 4 # this is awful
+	NUM = 5 # this is awful
 	h = zenity_progress("Downloading components... (this may take a long time)...", 0, gzenity " --ok-label 'Next' --cancel-label 'Back'")
 	print "20" | h
 	print "# Downloading macOS installation image (this WILL take a long time)..." | h
