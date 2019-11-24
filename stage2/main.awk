@@ -232,17 +232,20 @@ function uninstall(\
 
 function main_menu(\
 	opt,optlist) {
-	optlist = "Install"
+	optlist = "Install;Save System Information Log"
 	if (system("test -d /opt/ra1nstorm") == 0)
 		optlist = optlist ";Repair USB/VFIO Config;Boot VM;Uninstall"
 	opt = zenity_radiolist(optlist, "Please choose an action")
 	if (opt == 1) {
 		init_wizard(0)
 	} else if (opt == 2) {
-		init_wizard(7)
+		system("(uname -a; uptime; df -h; ls -lR /opt/ra1nstorm; dmesg; lspci -nn; lsusb; lsusb -t; lspci -v; lsusb -v) 2>&1 > $HOME/Desktop/SystemLog.txt")
+		zenity_alert("info", "A log file has been saved on your desktop. Please send it to a ra1n genius for help.")
 	} else if (opt == 3) {
-		system("bash $HOME/BootVM.sh")
+		init_wizard(7)
 	} else if (opt == 4) {
+		system("bash $HOME/BootVM.sh")
+	} else if (opt == 5) {
 		uninstall()
 	} else {
 		exit(0)
