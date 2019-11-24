@@ -12,4 +12,4 @@ echo "Checking if zenity and gawk are installed..."
 which gawk 2>&1 >/dev/null || apt install -y gawk
 which zenity 2>&1 >/dev/null || apt install -y zenity
 echo "Launching setup..."
-exec gawk -f main.awk
+gawk -f main.awk 2>&1 | tee -a /tmp/ra1nstorm.log
