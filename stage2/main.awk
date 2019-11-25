@@ -28,9 +28,6 @@ function wiz_checksys(\
 	if (!match(execforline("id -u"), /^0/)) {
 		print "# Error: you need to run ra1nstorm as root" | h
 		failed = 1
-	#} else if (!match(execforline("lscpu | grep Vendor && sleep 1"), /.*GenuineIntel.*/)) {
-	#	print "# Error: this computer does not have an Intel CPU" | h
-	#	failed = 1
 	} else if (execforline("df --output=avail $HOME | tail -n1") < (40 * 1024 * 1024) &&
 		system("test -d /opt/ra1nstorm/OSX-KVM") != 0) { # 40GiB
 		print "# Error: at least 40G of disk space is required" | h
@@ -236,12 +233,12 @@ function main_menu(\
 	optlist = "Install;Save System Information Log"
 	if (system("test -d /opt/ra1nstorm") == 0)
 		optlist = optlist ";Repair USB/VFIO Config;Boot VM;Uninstall"
-	opt = zenity_radiolist(optlist, "Please choose an action")
+	opt = zenity_radiolist(optlist, "ra1nstorm "RA1NVER": choose an action")
 	if (opt == 1) {
 		init_wizard(0)
 	} else if (opt == 2) {
-		system("(echo RA1NSTORM-0.9.3; uname -a; uptime; df -h; free -m; ls -lR /opt/ra1nstorm; bash /opt/ra1nstorm/OSX-KVM/scripts/lsgroup.sh; dmesg; cat /tmp/ra1nstorm.log; lscpu; lspci -vtnn; lsusb; lsusb -t; lspci -v; lsusb -v) 2>&1 > /tmp/SystemLog.txt && cp /tmp/SystemLog.txt $HOME/Desktop && chmod 666 $HOME/Desktop/SystemLog.txt && chmod 666 /tmp/SystemLog.txt")
-		zenity_alert("info", "A log file has been saved on your desktop. Please send it to a ra1n genius for help.")
+		system("(echo RA1NSTORM-"RA1NVER"; uname -a; uptime; df -h; free -m; ls -lR /opt/ra1nstorm; bash /opt/ra1nstorm/OSX-KVM/scripts/lsgroup.sh; dmesg; cat /tmp/ra1nstorm.log; lscpu; lspci -vtnn; lsusb; lsusb -t; lspci -v; lsusb -v) 2>&1 > /tmp/SystemLog.txt && cp /tmp/SystemLog.txt $HOME/Desktop && chmod 666 $HOME/Desktop/SystemLog.txt && chmod 666 /tmp/SystemLog.txt")
+		zenity_alert("info", "A log file (SystemLog.txt) has been saved on your desktop and in the /tmp folder.\nPlease send it to a ra1n genius for help.")
 	} else if (opt == 3) {
 		init_wizard(7)
 	} else if (opt == 4) {
@@ -254,6 +251,7 @@ function main_menu(\
 }
 
 BEGIN {
+	RA1NVER = "0.9.3"
 	gtitle = "ra1nstorm"
 	gzenity = "--width 800 --height 480"
 	split("python qemu uml-utilities virt-manager dmg2img git wget libguestfs-tools", REQPKGS, " ")
