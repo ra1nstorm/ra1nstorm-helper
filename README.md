@@ -1,67 +1,73 @@
 # ra1nstorm helper
+#### No official checkra1n support, no problem!
 
-The ra1nstorm helper prepares an environment adequate for running checkra1n.
+The ra1nstorm helper prepares an environment adequate for running checkra1n and exploiting your iOS device in a MacOS virtual machine.
 
-* **[Join us on Discord](https://discord.gg/e9W8cv8)**
-* **[Twitter](https://twitter.com/realra1nstorm)**
+* **[Join the Discord](https://discord.gg/e9W8cv8)**
+* **[Follow the Twitter](https://twitter.com/realra1nstorm)**
 
 ## Stage1
+##### For Windows Users
 
 Stage1 (`stage1/`) contains the Windows-part of the setup and is responsible
 for preparing the Linux environment.
 
 ## Stage2
+##### For Linux
 
 Stage2 (`stage2/`) contains the Linux part of the setup and prepares the macOS
 VM and automatically configures IOMMU/vfio.
 
+## Building
+ra1nstorm can be built using many common Linux distributions. Ubuntu is a commonly used one.
+Building ra1nstorm requires ```makeself``` and ```make```. Install both from your package manager to compile, and copy /usr/bin/makeself to /usr/bin/makeself.sh.
+To build ra1nstorm.run, simply use ```make ra1nstorm.run```.
+Building setup.exe requires Inno Setup 5 installed in C:/Program Files/Inno Setup 5/ISCC.exe using WINE from within Linux. Once installed, run ```make setup.exe``` to build.
+
 ## FAQ
 
 #### 1. Is it legal?
-
+##### Yes.
 ra1nstorm downloads freely available components like the macOS installer from
-official servers. We do not host any components ourselves.
+official Apple servers. We do not host any components ourselves.
 
-ra1nstorm is 100% legal
+ra1nstorm is 100% legal!
 
 #### 2. Does it work on iPads or iPods?
-
-ra1nstorm setup ~~does not~~ *should* currently work with iPads or iPods, but after initial
-setup, they will definitely work fine.
+##### Yes.
+ra1nstorm setup *should* currently work with all supported iPads or iPods, as long as they are supported by checkra1n.
 
 #### 3. How do I run checkra1n?
-
+##### Like you normally would.
 Simply visit the [checkra1n website](https://checkra.in) from within the VM
 and follow the instructions.
 
 #### 4. Does this work with AMD CPUs?
-
-Yes it does.
-
-~~ra1nstorm does not currently support AMD CPUs. This is because macOS does not
-work properly with them. Please complain to Apple, not us.~~
+##### Yes.
+Yes it does. Make sure AMD-V is on.
 
 #### 5. BootVM tells me that I need to enable "VT-d" or something. How?
-
-Steps for enabling Intel VT-d (IOMMU) vary by motherboard, but are usually like the
+##### Enable VT-D.
+Steps for enabling Intel VT-d/AMD-V (IOMMU) vary by motherboard, but are usually like the
 following:
 
 1. Enter the computer BIOS (probably F12 on boot)
-2. Navigate to an "Advanced" tab
-3. Select the "VT-d" or similar option
+2. Navigate to the "Advanced" tab or something similar
+3. Select the "VT-d", "AMD-V", or a similar option
 4. Enable it
 5. Reboot
 
 #### 6. Can't I just use Ubuntu from a USB flash drive?
-
-No you cannot. When ra1nstorm forwards the USB controller, your system will crash.
+##### NO!
+No you cannot. When ra1nstorm forwards the USB controller to MacOS, your system will crash.
 
 #### 7. Can I use other Linux distros that aren't Ubuntu?
-
+##### No.
 No, they are currently not supported, but probably will be in the future.
+###### Well, actually, you can, sorta. Follow the instructions at [macOS-Simple-KVM](https://github.com/foxlet/macOS-Simple-KVM), but this is not supported by ra1nstorm and you're basically on your own.
 
 #### 8. I can't boot Xubuntu. I get a security error.
-
+##### Disable Secure Boot.
 You need to disable Secure Boot in your BIOS. It varies by motherboard and computer,
 but it is generally simple to do and the option is always labeled `Secure Boot`.
 
