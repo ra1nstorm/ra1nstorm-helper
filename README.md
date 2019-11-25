@@ -1,7 +1,7 @@
 # ra1nstorm helper
 #### No official checkra1n support, no problem!
 
-The ra1nstorm helper prepares an environment adequate for running checkra1n and exploiting your iOS device in a MacOS virtual machine.
+The ra1nstorm helper prepares an environment adequate for running checkra1n and exploiting your iOS device in a macOS virtual machine.
 
 * **[Join the Discord](https://discord.gg/e9W8cv8)**
 * **[Follow the Twitter](https://twitter.com/realra1nstorm)**
@@ -19,7 +19,7 @@ Stage2 (`stage2/`) contains the Linux part of the setup and prepares the macOS
 VM and automatically configures IOMMU/vfio.
 
 ## Building
-ra1nstorm can be built using many common Linux distributions. Ubuntu is a commonly used one.
+ra1nstorm can be built on most Linux distributions. Ubuntu is the only one tested.
 Building ra1nstorm requires ```makeself``` and ```make```. Install both from your package manager to compile, and copy /usr/bin/makeself to /usr/bin/makeself.sh.
 To build ra1nstorm.run, simply use ```make ra1nstorm.run```.
 Building setup.exe requires Inno Setup 5 installed in C:/Program Files/Inno Setup 5/ISCC.exe using WINE from within Linux. Once installed, run ```make setup.exe``` to build.
@@ -48,12 +48,12 @@ Yes it does. Make sure AMD-V is on.
 
 #### 5. BootVM tells me that I need to enable "VT-d" or something. How?
 ##### Enable VT-D.
-Steps for enabling Intel VT-d/AMD-V (IOMMU) vary by motherboard, but are usually like the
+Steps for enabling Intel VT-d/SR-IOV (IOMMU) vary by motherboard, but are usually like the
 following:
 
 1. Enter the computer BIOS (probably F12 on boot)
 2. Navigate to the "Advanced" tab or something similar
-3. Select the "VT-d", "AMD-V", or a similar option
+3. Select the "VT-d", "SR-IOV", or a similar option
 4. Enable it
 5. Reboot
 
