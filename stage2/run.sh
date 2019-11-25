@@ -1,6 +1,8 @@
 #!/bin/sh
 # (C) 2019 Ronsor Labs, the ra1nstorm contributors, et al.
 
+# Fixes internationalization woes
+export LANG=C
 ID="$(id -u)"
 if [ "$ID" != 0 ]; then
 	echo "ra1nstorm must be run as root"

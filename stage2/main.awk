@@ -184,7 +184,7 @@ function wiz_configiommu(\
 	print "90" | h
 	print "PCI=" pciid > "/opt/ra1nstorm/vmconfig.sh"
 	print "Creating shortcuts..." | h
-	system("cp 'BootVM.sh' $HOME && cp 'BootVM.sh' $HOME/Desktop && chmod +x $HOME/BootVM.sh && chmod +x $HOME/Desktop/BootVM.sh")
+	system("cp 'BootVM.sh' $HOME && cp 'BootVM.sh' $HOME/Desktop && chmod 755 $HOME/BootVM.sh && chmod 755 $HOME/Desktop/BootVM.sh")
 	status = close(h)
 	if (status == 0 && !failed) {
 		wizard_next()
@@ -240,7 +240,7 @@ function main_menu(\
 	if (opt == 1) {
 		init_wizard(0)
 	} else if (opt == 2) {
-		system("(uname -a; uptime; df -h; free -m; ls -lR /opt/ra1nstorm; bash /opt/ra1nstorm/OSX-KVM/scripts/lsgroup.sh; dmesg; cat /tmp/ra1nstorm.log; lscpu; lspci -nn; lsusb; lsusb -t; lspci -v; lsusb -v) 2>&1 > $HOME/Desktop/SystemLog.txt && chmod 666 $HOME/Desktop/SystemLog.txt")
+		system("(echo RA1NSTORM-0.9.3; uname -a; uptime; df -h; free -m; ls -lR /opt/ra1nstorm; bash /opt/ra1nstorm/OSX-KVM/scripts/lsgroup.sh; dmesg; cat /tmp/ra1nstorm.log; lscpu; lspci -vtnn; lsusb; lsusb -t; lspci -v; lsusb -v) 2>&1 > /tmp/SystemLog.txt && cp /tmp/SystemLog.txt $HOME/Desktop && chmod 666 $HOME/Desktop/SystemLog.txt && chmod 666 /tmp/SystemLog.txt")
 		zenity_alert("info", "A log file has been saved on your desktop. Please send it to a ra1n genius for help.")
 	} else if (opt == 3) {
 		init_wizard(7)
@@ -256,7 +256,7 @@ function main_menu(\
 BEGIN {
 	gtitle = "ra1nstorm"
 	gzenity = "--width 800 --height 480"
-	split("qemu uml-utilities virt-manager dmg2img git wget libguestfs-tools", REQPKGS, " ")
+	split("python qemu uml-utilities virt-manager dmg2img git wget libguestfs-tools", REQPKGS, " ")
 	wizard[0] = "wiz_intro"
 	wizard[1] = "wiz_checksys"
 	wizard[2] = "wiz_installreq"

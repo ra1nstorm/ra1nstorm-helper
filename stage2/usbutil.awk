@@ -10,7 +10,7 @@ function find_usb_controller(driver,\
 	status = close(rdlnk)
 	if (status != 0) return ""
 #	/sys/devices/pci0000:00/0000:00:14.0/usb3/3-2/3-2:1.0
-	match(fullpath, /\/sys\/devices\/[^/]+\/0000:([^/]+)\//, a)
+	match(fullpath, /\/[^/]+\/0000:([^/]+)\/usb/, a)
 	return a[1]
 }
 
