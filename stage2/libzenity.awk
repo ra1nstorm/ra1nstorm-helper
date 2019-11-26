@@ -1,5 +1,13 @@
-function zenity(arg) {
-	return "zenity " arg
+function zenity(arg,\
+	usr,usra) {
+	# Don't run zenity as root anymore
+	if (ENVIRON["HOME"] ~ /\/home\//) {
+		split(ENVIRON["HOME"], usra, "/")
+		usr = usra[3]
+	} else {
+		usr = "nobody"
+	}
+	return "sudo -u "usr" zenity " arg
 }
 
 function zenity_html(file, title, other) {

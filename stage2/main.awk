@@ -156,7 +156,7 @@ function wiz_configiommu(\
 	pciid = ""
 	while (pciid == "") {
 		print "# Locating USB controller..." | h
-		pciid = find_usb_controller("ipheth")
+		pciid = new_find_usb_controller("05ac")
 		print "debug! pciid="pciid
 		if (!pciid) {
 			system("sleep 1")
@@ -166,7 +166,9 @@ function wiz_configiommu(\
 	}
 	print "45" | h
 	print "# Patching GRUB..." | h
-	ok = system("cp /etc/modules /etc/modules.bak && cp /etc/default/grub /etc/default/grub.bak && echo vfio >> /etc/modules && echo vfio_iommu_type1 >> /etc/modules && echo vfio_pci >> /etc/modules && echo vfio_virqfd >> /etc/modules &&" \
+	ok = system("cp /etc/modules.bak /etc/modules && cp /etc/default/grub.bak /etc/default/grub &&" \
+		"cp /etc/modules /etc/modules.bak && cp /etc/default/grub /etc/default/grub.bak &&" \
+		" echo vfio >> /etc/modules && echo vfio_iommu_type1 >> /etc/modules && echo vfio_pci >> /etc/modules && echo vfio_virqfd >> /etc/modules &&" \
 		"sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=\"/GRUB_CMDLINE_LINUX_DEFAULT=\"iommu=pt amd_iommu=on intel_iommu=on /' /etc/default/grub &&" \
 		"echo 'options vfio-pci ids=" pciid "' > /etc/modprobe.d/vfio.conf &&" \
 		"echo 'options vfio_iommu_type1 allow_unsafe_interrupts=1' >> /etc/modprobe.d/vfio.conf &&" \
@@ -251,7 +253,7 @@ function main_menu(\
 }
 
 BEGIN {
-	RA1NVER = "0.9.3"
+	RA1NVER = "0.9.4"
 	gtitle = "ra1nstorm"
 	gzenity = "--width 800 --height 480"
 	split("python qemu uml-utilities virt-manager dmg2img git wget libguestfs-tools", REQPKGS, " ")
