@@ -157,6 +157,7 @@ function wiz_configiommu(\
 	while (pciid == "") {
 		print "# Locating USB controller..." | h
 		pciid = new_find_usb_controller("05ac")
+		if (pciid == "") pciid = find_usb_controller("ipheth")
 		print "debug! pciid="pciid
 		if (!pciid) {
 			system("sleep 1")
@@ -166,7 +167,7 @@ function wiz_configiommu(\
 	}
 	print "45" | h
 	print "# Patching GRUB..." | h
-	ok = system("cp /etc/modules.bak /etc/modules && cp /etc/default/grub.bak /etc/default/grub &&" \
+	ok = system("(cp /etc/modules.bak /etc/modules ; cp /etc/default/grub.bak /etc/default/grub);" \
 		"cp /etc/modules /etc/modules.bak && cp /etc/default/grub /etc/default/grub.bak &&" \
 		" echo vfio >> /etc/modules && echo vfio_iommu_type1 >> /etc/modules && echo vfio_pci >> /etc/modules && echo vfio_virqfd >> /etc/modules &&" \
 		"sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT=\"/GRUB_CMDLINE_LINUX_DEFAULT=\"iommu=pt amd_iommu=on intel_iommu=on /' /etc/default/grub &&" \
