@@ -99,7 +99,7 @@ function wiz_osxkvm_git(\
 
 function wiz_osxkvm_getdmg(\
 	h,status,failed,NUM) {
-	NUM = 5 # this is awful
+	NUM = 3 # this is awful
 	h = zenity_progress("Downloading components... (this may take a long time)...", 0, gzenity " --ok-label 'Next' --cancel-label 'Back'")
 	print "20" | h
 	print "# Downloading macOS installation image (this WILL take a long time)..." | h
@@ -254,7 +254,7 @@ function main_menu(\
 }
 
 BEGIN {
-	RA1NVER = "0.9.4"
+	RA1NVER = "0.9.5"
 	gtitle = "ra1nstorm"
 	gzenity = "--width 800 --height 480"
 	split("python qemu uml-utilities virt-manager dmg2img git wget libguestfs-tools", REQPKGS, " ")

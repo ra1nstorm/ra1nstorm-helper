@@ -1,8 +1,8 @@
 #pragma include __INCLUDE__ + ";" + "idp\"
 [Setup]
 AppName                = ra1nstorm
-AppVerName             = 0.9.4
-AppVersion             = 0.9.4
+AppVerName             = 0.9.5
+AppVersion             = 0.9.5
 DefaultDirName         = {sd}\ra1nstorm
 DefaultGroupName       = ra1nstorm
 DisableDirPage         = yes
